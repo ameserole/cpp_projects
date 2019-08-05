@@ -34,7 +34,7 @@ void cppClient::sendLine(string buffer) {
 }
 
 string cppClient::recv(int numBytes) {
-	char inBuffer[SOCK_BUFF_LEN] = {0};
+	char inBuffer[SOCK_BUFF_LEN + 1] = {0};
 	int totalBytes = 0;
 	string totalBuffer = "";
 	int valRead = 0;
@@ -73,4 +73,47 @@ string cppClient::recv() {
 	}
 
 	return totalBuffer;	
+}
+
+string cppClient::recvUntil(string bytes) {
+	string byte = "";
+	string totalBuffer = "";
+	while(totalBuffer.find(bytes) == string::npos) {
+		byte = cppClient::recv(1);
+		totalBuffer += byte;
+	}
+
+	return totalBuffer;
+}
+
+string cppClient::recvLine() {
+	return recvUntil("\n");
+}
+
+void cppClient::termInput() {
+	string userIn = "";
+
+	while(true) {
+		cout << "=> ";
+		getline(cin, userIn);
+		cppClient::sendLine(userIn);
+	}
+}
+
+void cppClient::termOutput() {
+	string termOut = "";
+
+	while(true) {
+		termOut = cppClient::recv();
+		if(termOut != "")
+			cout << termOut << endl;
+	}
+}
+
+void cppClient::interactive() {
+	thread termIn(&cppClient::termInput, this);
+	thread termOut(&cppClient::termOutput, this);
+
+	termIn.join();
+	termOut.join();
 }

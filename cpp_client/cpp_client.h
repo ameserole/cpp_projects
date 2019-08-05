@@ -7,6 +7,7 @@
 #include <string.h>
 #include <string>
 #include <iostream>
+#include <thread>
 
 #define SOCK_BUFF_LEN 1024
 
@@ -21,6 +22,9 @@ private:
 	struct hostent *server;
 	int sockfd = 0;
 
+	void termInput();
+	void termOutput();
+
 public:
 	cppClient(string addr, int p);
 	~cppClient();
@@ -28,7 +32,7 @@ public:
 	string recv();
 	string recv(int numBytes);
 	string recvLine();
-	string recvUntil();
+	string recvUntil(string bytes);
 
 	void send(string buffer);
 	void sendLine(string buffer);
